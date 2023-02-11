@@ -18,6 +18,22 @@ static const char *colors[][3] = {
     [SchemeSel] = {col_gray4, col_cyan, col_cyan},
 };
 
+// Scratchpad
+typedef struct {
+  const char *name;
+  const void *cmd;
+} Sp;
+const char *spcmd1[] = {"st", "-n", "spterm", "-g", "120x34", NULL};
+const char *spcmd2[] = {"st",     "-n", "spfm",   "-g",
+                        "144x41", "-e", "ranger", NULL};
+const char *spcmd3[] = {"keepassxc", NULL};
+static Sp scratchpads[] = {
+    /* name          cmd  */
+    {"spterm", spcmd1},
+    {"spranger", spcmd2},
+    {"keepassxc", spcmd3},
+};
+
 /* tagging */
 static const char *tags[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
@@ -29,6 +45,10 @@ static const Rule rules[] = {
     /* class      instance    title       tags mask     isfloating   monitor */
     {"Gimp", NULL, NULL, 0, 1, -1},
     {"Firefox", NULL, NULL, 1 << 8, 0, -1},
+    {NULL, "spterm", NULL, SPTAG(0), 1, -1},
+    {NULL, "spfm", NULL, SPTAG(1), 1, -1},
+    {NULL, "keepassxc", NULL, SPTAG(2), 0, -1},
+
 };
 
 /* layout(s) */
@@ -67,6 +87,8 @@ static const Layout layouts[] = {
   }
 
 /* commands */
+static char dmenumon[2] =
+    "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = {"dmenu_run", "-fn", dmenufont, "-nb",
                                  col_gray1,   "-nf", col_gray3, "-sb",
                                  col_cyan,    "-sf", col_gray4, NULL};
@@ -101,6 +123,10 @@ static const Key keys[] = {
     {MODKEY, XK_period, focusmon, {.i = +1}},
     {MODKEY | ShiftMask, XK_comma, tagmon, {.i = -1}},
     {MODKEY | ShiftMask, XK_period, tagmon, {.i = +1}},
+    {MODKEY, XK_y, togglescratch, {.ui = 0}},
+    {MODKEY, XK_u, togglescratch, {.ui = 1}},
+    {MODKEY, XK_x, togglescratch, {.ui = 2}},
+
     TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3)
         TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7)
             TAGKEYS(XK_9, 8){MODKEY | ShiftMask, XK_q, quit, {0}},
