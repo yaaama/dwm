@@ -23,6 +23,7 @@
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
+#include <X11/Xresource.h>
 #include <X11/Xutil.h>
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
@@ -184,6 +185,15 @@ typedef struct {
   int monitor;
 } Rule;
 
+/* Xresources preferences */
+enum resource_type { STRING = 0, INTEGER = 1, FLOAT = 2 };
+
+typedef struct {
+  char *name;
+  enum resource_type type;
+  void *dst;
+} ResourcePref;
+
 /* function declarations */
 static void applyrules(Client *c);
 static int applysizehints(Client *c, int *x, int *y, int *w, int *h,
@@ -201,7 +211,7 @@ static void configure(Client *c);
 static void configurenotify(XEvent *e);
 static void configurerequest(XEvent *e);
 static Monitor *createmon(void);
-//static void deck(Monitor *m);
+// static void deck(Monitor *m);
 static void destroynotify(XEvent *e);
 static void detach(Client *c);
 static void detachstack(Client *c);
@@ -284,6 +294,9 @@ static int xerror(Display *dpy, XErrorEvent *ee);
 static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void zoom(const Arg *arg);
+static void load_xresources(void);
+static void resource_load(XrmDatabase db, char *name, enum resource_type rtype,
+                          void *dst);
 
 static pid_t getparentprocess(pid_t p);
 static int isdescprocess(pid_t p, pid_t c);
@@ -708,29 +721,29 @@ void destroynotify(XEvent *e) {
     unmanage(c, 1);
 }
 
-//void deck(Monitor *m) {
-//  unsigned int i, n, h, mw, my;
-//  Client *c;
+// void deck(Monitor *m) {
+//   unsigned int i, n, h, mw, my;
+//   Client *c;
 //
-//  for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++)
-//    ;
-//  if (n == 0)
-//    return;
+//   for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++)
+//     ;
+//   if (n == 0)
+//     return;
 //
-//  if (n > m->nmaster) {
-//    mw = m->nmaster ? m->ww * m->mfact : 0;
-//    snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n - m->nmaster);
-//  } else
-//    mw = m->ww;
-//  for (i = my = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
-//    if (i < m->nmaster) {
-//      h = (m->wh - my) / (MIN(n, m->nmaster) - i);
-//      resize(c, m->wx, m->wy + my, mw - (2 * c->bw), h - (2 * c->bw), False);
-//      my += HEIGHT(c);
-//    } else
-//      resize(c, m->wx + mw, m->wy, m->ww - mw - (2 * c->bw),
-//             m->wh - (2 * c->bw), False);
-//}
+//   if (n > m->nmaster) {
+//     mw = m->nmaster ? m->ww * m->mfact : 0;
+//     snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n - m->nmaster);
+//   } else
+//     mw = m->ww;
+//   for (i = my = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+//     if (i < m->nmaster) {
+//       h = (m->wh - my) / (MIN(n, m->nmaster) - i);
+//       resize(c, m->wx, m->wy + my, mw - (2 * c->bw), h - (2 * c->bw), False);
+//       my += HEIGHT(c);
+//     } else
+//       resize(c, m->wx + mw, m->wy, m->ww - mw - (2 * c->bw),
+//              m->wh - (2 * c->bw), False);
+// }
 
 void detach(Client *c) {
   Client **tc;
@@ -2108,6 +2121,56 @@ void zoom(const Arg *arg) {
   pop(c);
 }
 
+void resource_load(XrmDatabase db, char *name, enum resource_type rtype,
+                   void *dst) {
+  char *sdst = NULL;
+  int *idst = NULL;
+  float *fdst = NULL;
+
+  sdst = dst;
+  idst = dst;
+  fdst = dst;
+
+  char fullname[256];
+  char *type;
+  XrmValue ret;
+
+  snprintf(fullname, sizeof(fullname), "%s.%s", "dwm", name);
+  fullname[sizeof(fullname) - 1] = '\0';
+
+  XrmGetResource(db, fullname, "*", &type, &ret);
+  if (!(ret.addr == NULL || strncmp("String", type, 64))) {
+    switch (rtype) {
+    case STRING:
+      strcpy(sdst, ret.addr);
+      break;
+    case INTEGER:
+      *idst = strtoul(ret.addr, NULL, 10);
+      break;
+    case FLOAT:
+      *fdst = strtof(ret.addr, NULL);
+      break;
+    }
+  }
+}
+
+void load_xresources(void) {
+  Display *display;
+  char *resm;
+  XrmDatabase db;
+  ResourcePref *p;
+
+  display = XOpenDisplay(NULL);
+  resm = XResourceManagerString(display);
+  if (!resm)
+    return;
+
+  db = XrmGetStringDatabase(resm);
+  for (p = resources; p < resources + LENGTH(resources); p++)
+    resource_load(db, p->name, p->type, p->dst);
+  XCloseDisplay(display);
+}
+
 int main(int argc, char *argv[]) {
   if (argc == 2 && !strcmp("-v", argv[1]))
     die("dwm-" VERSION);
@@ -2118,6 +2181,8 @@ int main(int argc, char *argv[]) {
   if (!(dpy = XOpenDisplay(NULL)))
     die("dwm: cannot open display");
   checkotherwm();
+  XrmInitialize();
+  load_xresources();
   setup();
 #ifdef __OpenBSD__
   if (pledge("stdio rpath proc exec", NULL) == -1)
