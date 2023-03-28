@@ -98,8 +98,8 @@ static const Rule rules[] = {
     {TERMCLASS, "bg", NULL, 1 << 7, 0, 1, 0, -1},
     {TERMCLASS, "spterm", NULL, SPTAG(0), 1, 1, 0, -1},
     {TERMCLASS, "spcalc", NULL, SPTAG(1), 1, 1, 0, -1},
-    // Pulsemixer is now a floating window
     {TERMCLASS, NULL, "pulsemixer", 0, 1, 0, 0, -1},
+    {TERMCLASS, NULL, "nmtui", 0, 1, 0, 0, -1}
     //{"Emacs", ""}
 };
 
@@ -224,7 +224,7 @@ static Key keys[] = {
     //{ MODKEY|ShiftMask,		XK_p,			spawn, SHCMD("mpc pause ; pauseallmpv") },
     { MODKEY, XK_bracketleft, shiftview, {.i = -1} },
     // { MODKEY|ShiftMask, XK_bracketleft,		spawn, SHCMD("mpc seek -60") },
-    { MODKEY,			XK_bracketright, shiftview, {.i = 1} },
+    { MODKEY,XK_bracketright, shiftview, {.i = 1} },
     // { MODKEY|ShiftMask,		XK_bracketright,	spawn, SHCMD("mpc seek +60") },
     {MODKEY, XK_backslash, view, {0}},
     /* { MODKEY|ShiftMask,		XK_backslash,		spawn, * SHCMD("") * }, */
