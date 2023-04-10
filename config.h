@@ -20,6 +20,9 @@ static char *fonts[] = {
     "monospace:size=10",
     "NotoColorEmoji:pixelsize=11:antialias=true:autohint=true"};
 
+#define SESSION_FILE "/tmp/dwm-session"
+
+
 // Gruvbox colours
 //static const char dmenufont[] = "monospace:size=10";
 // static const char col_gray1[] = "#282828";
@@ -65,6 +68,7 @@ static char selbgcolor[] = "#005577";
 //     [SchemeNorm] = {normfgcolor, normbgcolor, normbordercolor},
 //     [SchemeSel] = {selfgcolor, selbgcolor, selbordercolor},
 // };
+//
 
 typedef struct {
   const char *name;
@@ -201,6 +205,7 @@ static Key keys[] = {
     {MODKEY, XK_Tab, view, {0}},
     /* * { MODKEY|ShiftMask,		XK_Tab,		spawn, SHCMD("") * }, */
     {MODKEY, XK_q, killclient, {0}},
+    {MODKEY|ControlMask,           XK_r,      quit,           {1} },
     {MODKEY | ShiftMask, XK_q, spawn, SHCMD("sysact")},
     {MODKEY, XK_w, spawn, SHCMD("$BROWSER")},
     // TODO Replace reference to brave with a env variable called altbrowser
