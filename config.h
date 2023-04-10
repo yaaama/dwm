@@ -72,9 +72,8 @@ typedef struct {
 } Sp;
 
 const char *spcmd1[] = {TERMINAL, "-n", "spterm", "-g", "120x34", NULL};
-const char *spcmd2[] = {TERMINAL, "-n",    "spcalc", "-f", "monospace:size=16",
-                        "-g",     "50x20", "-e",     "bc", "-lq",
-                        NULL};
+// TODO: Change spcmd2 to open up my task list instead
+const char *spcmd2[] = {TERMINAL, "-n",    "spcalc", "-f", "monospace:size=14", "-g",     "120x120", "-e",     "bc", "-lq", NULL};
 
 static Sp scratchpads[] = {
     /* name          cmd  */
@@ -85,13 +84,13 @@ static Sp scratchpads[] = {
 /* tagging */
 static const char *tags[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
+
 static const Rule rules[] = {
     /* xprop(1):
      *	WM_CLASS(STRING) = instance, class
      *	WM_NAME(STRING) = title
      */
-    /* class    instance      title     tags mask    isfloating   isterminal
-       noswallow     monitor */
+    /* class    instance      title     tags mask    isfloating   isterminal    noswallow     monitor */
     {"Gimp", NULL, NULL, 1 << 8, 0, 0, 0, -1},
     {TERMCLASS, NULL, NULL, 0, 0, 1, 0, -1},
     {NULL, NULL, "Event Tester", 0, 0, 0, 1, -1},
@@ -99,8 +98,9 @@ static const Rule rules[] = {
     {TERMCLASS, "spterm", NULL, SPTAG(0), 1, 1, 0, -1},
     {TERMCLASS, "spcalc", NULL, SPTAG(1), 1, 1, 0, -1},
     {TERMCLASS, NULL, "pulsemixer", 0, 1, 0, 0, -1},
-    {TERMCLASS, NULL, "nmtui", 0, 1, 0, 0, -1}
-    //{"Emacs", ""}
+    {TERMCLASS, NULL, "nmtui", 0, 1, 0, 0, -1},
+    {TERMCLASS, NULL, "bmon", 0, 1, 0, 0, -1}
+
 };
 
 /* layout(s) */
