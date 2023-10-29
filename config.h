@@ -1,14 +1,18 @@
 /* See LICENSE file for copyright and license details. */
 
+/* Silences stupid compiler errors */
+#define NULL ((char *)0)
+
 /* Constants */
 #define TERMINAL "st"
 #define TERMCLASS "St"
+#define ALTBROWSER "thorium-browser"
 
 /* appearance */
 static unsigned int borderpx = 2; /* border pixel of windows */
 static unsigned int snap = 32;    /* snap pixel */
-static unsigned int gappih = 0;   /* horiz inner gap between windows */
-static unsigned int gappiv = 0;   /* vert inner gap between windows */
+static unsigned int gappih = 3;   /* horiz inner gap between windows */
+static unsigned int gappiv = 3;   /* vert inner gap between windows */
 static unsigned int gappoh =
     5; /* horiz outer gap between windows and screen edge */
 static unsigned int gappov =
@@ -26,39 +30,48 @@ static char *fonts[] = {
 
 #define SESSION_FILE "/tmp/dwm-session"
 
-// static const char normfgcolor[] = "#D5C4A1";
-// static const char normbgcolor[] = "#1d2021";
-// static const char normbordercolor[] = "#665c54";
-//
-///* static const char sel_fg[] = "#FE8019"; */
-// static const char selfgcolor[] = "#fb4934";
-// static const char selbgcolor[] = "#1d2021";
-// static const char selbordercolor[] = "#fbf1c7";
-// static const char *colors[][3] = {
-//     /*               fg           bg          border */
-//[SchemeNorm] = {normfgcolor, normbgcolor, normbordercolor}, // unfocused wins
-//     [SchemeSel] = {selfgcolor, selbgcolor, selbordercolor},     // the
-//     focused win
-// };
+/* Gruvbox scheme */
+/*
+*#define white 	#ebdbb2
+#define black 	#282828
+#define black0 	#1d2021
+#define gray1 	#928374
+#define gray2 	#a89984
+#define red1 		#cc241d
+#define red2 		#fb4934
+#define green1 	#98971a
+#define green2 	#b8bb26
+#define yellow1 #d79921
+#define yellow2 #fabd2f
+#define blue1 	#458488
+#define blue2 	#83a598
+#define purple1 #b16286
+#define purple2 #d3869b
+#define aqua1 	#689d6a
+#define aqua2 	#8ec07c
+#define orange1 #d65d0e
+#define orange2 #fe8019
+*
+*  */
 
-/**************************/
-/*  dracula color plate */
-/**************************/
-// static const char dra_bg[] = "#282a36";
-// static const char dra_fg[] = "#f8f8f2";
-// static const char dra_cyan[] = "#8be9fd";
-// static const char dra_green[] = "#50fa7b";
-// static const char dra_orange[] = "#ffb86c";
-// static const char dra_pink[] = "#ff79c6";
-// static const char dra_purple[] = "#bd93f9";
-// static const char dra_red[] = "#ff5555";
-// static const char dra_yellow[] = "#f1fa8c";
-//// Top Bar Color Customization
-// static const char *colors[][3] = {
-//     /*               fg         bg         border   */
-//     [SchemeNorm] = {dra_pink, dra_bg, dra_bg},
-//     [SchemeSel] = {dra_purple, dra_bg, dra_cyan},
-// };
+/* Normal */
+static char gruvbox_normfgcolor[] = "#fe8019";
+static char gruvbox_normbgcolor[] = "#282828";
+static char gruvbox_normbordercolor[] = "#282828";
+static char gruvbox_normbfloatcolor[] = "#928374";
+/* Selected */
+static char gruvbox_selectedfgcolor[] = "#458488";
+static char gruvbox_selectedbgcolor[] = "#282828";
+static char gruvbox_selectedbordercolor[] = "#fe8019";
+static char gruvbox_selectedbfloatcolor[] = "#458488";
+
+/* static char *colors[][3] = { */
+/*     [SchemeNorm] = {gruvbox_normfgcolor, gruvbox_normbgcolor, */
+/*                     gruvbox_normbordercolor}, */
+/*     [SchemeSel] = {gruvbox_selectedfgcolor, gruvbox_selectedbgcolor, */
+/*                    gruvbox_selectedbordercolor}, */
+/* }; */
+
 
 /*********************************/
 /* /\* Default colour scheme *\/ */
@@ -67,10 +80,9 @@ static char normbgcolor[] = "#222222";
 static char normbordercolor[] = "#444444";
 static char normfgcolor[] = "#bbbbbb";
 static char selfgcolor[] = "#eeeeee";
-// static char selbordercolor[] = "#770000"; */
 static char selbordercolor[] = "#d24141";
-// static char selbordercolor[] = "#1a1a1a"; */
 static char selbgcolor[] = "#005577";
+
 static char *colors[][3] = {
     /*               fg           bg           border   */
     [SchemeNorm] = {normfgcolor, normbgcolor, normbordercolor},
@@ -82,7 +94,7 @@ typedef struct {
   const void *cmd;
 } Sp;
 
-const char *spcmd1[] = {TERMINAL, "-n", "spterm", "-g", "120x34", NULL};
+const char *spcmd1[] = {TERMINAL, "-n", "spterm", "-g", "160x48", NULL};
 // TODO: Change spcmd2 to open up my task list instead
 const char *spcmd2[] = {
     TERMINAL, "-n", "spcalc", "-f", "monospace:size=14", "-g", "120x120",
@@ -102,9 +114,8 @@ static const Rule rules[] = {
      *	WM_CLASS(STRING) = instance, class
      *	WM_NAME(STRING) = title
      */
-    /* class    instance      title     tags mask    isfloating   isterminal
-       noswallow     monitor */
-    {"Gimp", NULL, NULL, 1 << 8, 0, 0, 0, -1},
+    /* 1class  2instance  3title  4tags mask  5isfloating  6isterminal 7noswallow  8monitor */
+    {"Gimp", NULL, NULL, 0, 0, 0, 0, -1},
     {TERMCLASS, NULL, NULL, 0, 0, 1, 0, -1},
     {NULL, NULL, "Event Tester", 0, 0, 0, 1, -1},
     {TERMCLASS, "bg", NULL, 1 << 7, 0, 1, 0, -1},
@@ -112,7 +123,8 @@ static const Rule rules[] = {
     {TERMCLASS, "spcalc", NULL, SPTAG(1), 1, 1, 0, -1},
     {TERMCLASS, NULL, "pulsemixer", 0, 1, 0, 0, -1},
     {TERMCLASS, NULL, "nmtui", 0, 1, 0, 0, -1},
-    {TERMCLASS, NULL, "bmon", 0, 1, 0, 0, -1}
+    {TERMCLASS, NULL, "bmon", 0, 1, 0, 0, -1},
+    {"pavucontrol", NULL, NULL, 0, 1, 0, 0, -1},
 
 };
 
@@ -120,23 +132,23 @@ static const Rule rules[] = {
 static float mfact = 0.6;   /* factor of master area size [0.05..0.95] */
 static int nmaster = 1;     /* number of clients in master area */
 static int resizehints = 0; /* 1 means respect size hints in tiled resizals */
-#define FORCE_VSPLIT                                                           \
-  1 /* nrowgrid layout: force two clients to always split vertically */
+#define FORCE_VSPLIT 1
+/* nrowgrid layout: force two clients to always split vertically */
 
 #include "vanitygaps.c"
 static const Layout layouts[] = {
     /* symbol     arrange function */
     {"[]=", tile},   /* Default: Master on left, slaves on right */
-    {"TTT", bstack}, /* Master on top, slaves on bottom */
-
     {"[@]", spiral},   /* Fibonacci spiral */
-    {"[\\]", dwindle}, /* Decreasing in size right and leftward */
+    // {"[\\]", dwindle}, /* Decreasing in size right and leftward */
+    // {"TTT", bstack}, /* Master on top, slaves on bottom */
+    // {">M>", centeredfloatingmaster}, /* Same but master floats */
+    // {"|M|", centeredmaster},         /* Master in middle, slaves on sides */
+
 
     {"[D]", deck},    /* Master on left, slaves in monocle-like mode on right */
     {"[M]", monocle}, /* All windows on top of eachother */
 
-    {"|M|", centeredmaster},         /* Master in middle, slaves on sides */
-    {">M>", centeredfloatingmaster}, /* Same but master floats */
 
     {"><>", NULL}, /* no layout function means floating behavior */
     {NULL, NULL},
@@ -166,8 +178,7 @@ static const Layout layouts[] = {
     .v = (const char *[]) { "/bin/sh", "-c", cmd, NULL }                       \
   }
 
-/* commands */
-static const char *termcmd[] = {TERMINAL, NULL};
+
 
 /* * Xresources preferences to load at startup */
 ResourcePref resources[] = {
@@ -191,6 +202,11 @@ ResourcePref resources[] = {
     {"swallowfloating", INTEGER, &swallowfloating},
     {"smartgaps", INTEGER, &smartgaps},
 };
+
+
+/* commands */
+static const char *termcmd[] = {TERMINAL, NULL};
+
 
 #include "shiftview.c"
 #include <X11/XF86keysym.h>
@@ -225,25 +241,20 @@ static Key keys[] = {
     {MODKEY | ControlMask, XK_r, quit, {1}},
     {MODKEY | ShiftMask, XK_q, spawn, SHCMD("xkill")},
     {MODKEY, XK_w, spawn, SHCMD("$BROWSER")},
-    // TODO Replace reference to brave with a env variable called altbrowser
-    {MODKEY | ShiftMask, XK_w, spawn, SHCMD("brave")},
+    {MODKEY | ShiftMask, XK_w, spawn, SHCMD(ALTBROWSER)},
     //{MODKEY | ShiftMask, XK_w, spawn, SHCMD(TERMINAL " -e sudo nmtui")},
     {MODKEY, XK_e, spawn, SHCMD("mace")},
-    // {MODKEY|ShiftMask, XK_e, spawn,		SHCMD(TERMINAL " -e abook -C
-    // ~/.config/abook/abookrc --datafile ~/.config/abook/addressbook") },
+    /* {MODKEY|ShiftMask, XK_e, spawn, SHCMD(TERMINAL " -e abook -C ~/.config/abook/abookrc --datafile ~/.config/abook/addressbook") }, */
     {MODKEY, XK_r, spawn, SHCMD(TERMINAL " -e lf")},
     {MODKEY | ShiftMask, XK_r, spawn, SHCMD(TERMINAL " -e btop")},
     {MODKEY, XK_t, setlayout, {.v = &layouts[0]}},             /* tile */
-    {MODKEY | ShiftMask, XK_t, setlayout, {.v = &layouts[1]}}, /* bstack */
+    // {MODKEY | ShiftMask, XK_t, setlayout, {.v = &layouts[1]}}, /* bstack */
     {MODKEY, XK_y, setlayout, {.v = &layouts[2]}},             /* spiral */
-    {MODKEY | ShiftMask, XK_y, setlayout, {.v = &layouts[3]}}, /* dwindle */
+    // {MODKEY | ShiftMask, XK_y, setlayout, {.v = &layouts[3]}}, /* dwindle */
     {MODKEY, XK_u, setlayout, {.v = &layouts[4]}},             /* deck */
     {MODKEY | ShiftMask, XK_u, setlayout, {.v = &layouts[5]}}, /* monocle */
-    {MODKEY, XK_i, setlayout, {.v = &layouts[6]}}, /* centeredmaster */
-    {MODKEY | ShiftMask,
-     XK_i,
-     setlayout,
-     {.v = &layouts[7]}}, /* centeredfloatingmaster */
+    // {MODKEY, XK_i, setlayout, {.v = &layouts[6]}}, /* centeredmaster */
+    // {MODKEY | ShiftMask, XK_i, setlayout, {.v = &layouts[7]}}, /* centeredfloatingmaster */
     {MODKEY, XK_o, incnmaster, {.i = +1}},
     {MODKEY | ShiftMask, XK_o, incnmaster, {.i = -1}},
     {MODKEY, XK_p, spawn, SHCMD("passmenu")},
@@ -332,8 +343,7 @@ static Key keys[] = {
     // { MODKEY,			XK_F7,		spawn,
     // SHCMD("td-toggle") },
     {MODKEY, XK_F8, spawn,
-     SHCMD("lobster --rofi")}, /* Watch movies and tv shows from just a single
-                                  click! */
+     SHCMD("lobster --rofi")}, /* Watch movies and tv shows */
     // { MODKEY,			XK_F9,		spawn,
     // SHCMD("dmenumount")
     // }, { MODKEY,			XK_F10,		spawn,
