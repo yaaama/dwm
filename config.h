@@ -11,6 +11,14 @@
 /* appearance */
 static unsigned int borderpx = 2; /* border pixel of windows */
 static unsigned int snap = 32;    /* snap pixel */
+static const unsigned int systraypinning =
+    0; /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor
+          X */
+static const unsigned int systrayspacing = 2; /* systray spacing */
+static const int systraypinningfailfirst =
+    1; /* 1: if pinning fails, display systray on the first monitor, False:
+          display systray on the last monitor*/
+static const int showsystray = 1; /* 0 means no systray */
 static unsigned int gappih = 3;   /* horiz inner gap between windows */
 static unsigned int gappiv = 3;   /* vert inner gap between windows */
 static unsigned int gappoh =
@@ -72,7 +80,6 @@ static char gruvbox_selectedbfloatcolor[] = "#458488";
 /*                    gruvbox_selectedbordercolor}, */
 /* }; */
 
-
 /*********************************/
 /* /\* Default colour scheme *\/ */
 /*********************************/
@@ -114,7 +121,8 @@ static const Rule rules[] = {
      *	WM_CLASS(STRING) = instance, class
      *	WM_NAME(STRING) = title
      */
-    /* 1class  2instance  3title  4tags mask  5isfloating  6isterminal 7noswallow  8monitor */
+    /* 1class  2instance  3title  4tags mask  5isfloating  6isterminal
+       7noswallow  8monitor */
     {"Gimp", NULL, NULL, 0, 0, 0, 0, -1},
     {TERMCLASS, NULL, NULL, 0, 0, 1, 0, -1},
     {NULL, NULL, "Event Tester", 0, 0, 0, 1, -1},
@@ -139,16 +147,14 @@ static int resizehints = 0; /* 1 means respect size hints in tiled resizals */
 static const Layout layouts[] = {
     /* symbol     arrange function */
     {"[]=", tile},   /* Default: Master on left, slaves on right */
-    {"[@]", spiral},   /* Fibonacci spiral */
+    {"[@]", spiral}, /* Fibonacci spiral */
     // {"[\\]", dwindle}, /* Decreasing in size right and leftward */
     // {"TTT", bstack}, /* Master on top, slaves on bottom */
     // {">M>", centeredfloatingmaster}, /* Same but master floats */
     // {"|M|", centeredmaster},         /* Master in middle, slaves on sides */
 
-
     {"[D]", deck},    /* Master on left, slaves in monocle-like mode on right */
     {"[M]", monocle}, /* All windows on top of eachother */
-
 
     {"><>", NULL}, /* no layout function means floating behavior */
     {NULL, NULL},
@@ -178,8 +184,6 @@ static const Layout layouts[] = {
     .v = (const char *[]) { "/bin/sh", "-c", cmd, NULL }                       \
   }
 
-
-
 /* * Xresources preferences to load at startup */
 ResourcePref resources[] = {
     {"color0", STRING, &normbordercolor},
@@ -203,10 +207,8 @@ ResourcePref resources[] = {
     {"smartgaps", INTEGER, &smartgaps},
 };
 
-
 /* commands */
 static const char *termcmd[] = {TERMINAL, NULL};
-
 
 #include "shiftview.c"
 #include <X11/XF86keysym.h>
@@ -244,17 +246,19 @@ static Key keys[] = {
     {MODKEY | ShiftMask, XK_w, spawn, SHCMD(ALTBROWSER)},
     //{MODKEY | ShiftMask, XK_w, spawn, SHCMD(TERMINAL " -e sudo nmtui")},
     {MODKEY, XK_e, spawn, SHCMD("mace")},
-    /* {MODKEY|ShiftMask, XK_e, spawn, SHCMD(TERMINAL " -e abook -C ~/.config/abook/abookrc --datafile ~/.config/abook/addressbook") }, */
+    /* {MODKEY|ShiftMask, XK_e, spawn, SHCMD(TERMINAL " -e abook -C
+       ~/.config/abook/abookrc --datafile ~/.config/abook/addressbook") }, */
     {MODKEY, XK_r, spawn, SHCMD(TERMINAL " -e lf")},
     {MODKEY | ShiftMask, XK_r, spawn, SHCMD(TERMINAL " -e btop")},
-    {MODKEY, XK_t, setlayout, {.v = &layouts[0]}},             /* tile */
+    {MODKEY, XK_t, setlayout, {.v = &layouts[0]}}, /* tile */
     // {MODKEY | ShiftMask, XK_t, setlayout, {.v = &layouts[1]}}, /* bstack */
-    {MODKEY, XK_y, setlayout, {.v = &layouts[2]}},             /* spiral */
+    {MODKEY, XK_y, setlayout, {.v = &layouts[2]}}, /* spiral */
     // {MODKEY | ShiftMask, XK_y, setlayout, {.v = &layouts[3]}}, /* dwindle */
     {MODKEY, XK_u, setlayout, {.v = &layouts[4]}},             /* deck */
     {MODKEY | ShiftMask, XK_u, setlayout, {.v = &layouts[5]}}, /* monocle */
     // {MODKEY, XK_i, setlayout, {.v = &layouts[6]}}, /* centeredmaster */
-    // {MODKEY | ShiftMask, XK_i, setlayout, {.v = &layouts[7]}}, /* centeredfloatingmaster */
+    // {MODKEY | ShiftMask, XK_i, setlayout, {.v = &layouts[7]}}, /*
+    // centeredfloatingmaster */
     {MODKEY, XK_o, incnmaster, {.i = +1}},
     {MODKEY | ShiftMask, XK_o, incnmaster, {.i = -1}},
     {MODKEY, XK_p, spawn, SHCMD("passmenu")},
